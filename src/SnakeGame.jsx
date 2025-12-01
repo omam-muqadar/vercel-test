@@ -12,7 +12,8 @@ const FRUITS = [
   { type: 'banana', emoji: '🍌', points: 15, color: '#ffeb3b' },
   { type: 'grape', emoji: '🍇', points: 20, color: '#9c27b0' },
   { type: 'orange', emoji: '🍊', points: 25, color: '#ff9800' },
-  { type: 'watermelon', emoji: '🍉', points: 30, color: '#4caf50' }
+  { type: 'watermelon', emoji: '🍉', points: 30, color: '#4caf50' },
+  { type: 'strawberry', emoji: '🍓', points: 35, color: '#e91e63' }
 ]
 
 function SnakeGame() {
