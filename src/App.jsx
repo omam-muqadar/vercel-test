@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import './App.css'
+import SnakeGame from './SnakeGame'
 
 function App() {
   const [todos, setTodos] = useState([])
@@ -73,7 +74,8 @@ function App() {
 
   return (
     <main className="app">
-      <div className="todo-container">
+      <div className="app-grid">
+        <div className="todo-container">
         <h1>To-Do List</h1>
 
         <div className="input-section">
@@ -139,6 +141,9 @@ function App() {
         {todos.length === 0 && (
           <p className="empty-message">No tasks yet. Add one to get started!</p>
         )}
+        </div>
+
+        <SnakeGame />
       </div>
     </main>
   )

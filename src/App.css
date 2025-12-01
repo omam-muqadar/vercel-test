@@ -11,9 +11,22 @@
 
 .app {
   width: 100%;
-  max-width: 600px;
+  max-width: 1400px;
   padding: 2rem;
   margin: 0 auto;
+}
+
+.app-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+  gap: 2rem;
+  align-items: start;
+}
+
+@media (max-width: 1024px) {
+  .app-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .todo-container {
