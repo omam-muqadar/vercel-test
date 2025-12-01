@@ -1,9 +1,24 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import './App.css'
 
 function App() {
   const [todos, setTodos] = useState([])
   const [inputValue, setInputValue] = useState('')
+  const [editingId, setEditingId] = useState(null)
+  const [editingText, setEditingText] = useState('')
+
+  // Load todos from localStorage on mount
+  useEffect(() => {
+    const savedTodos = localStorage.getItem('todos')
+    if (savedTodos) {
+      setTodos(JSON.parse(savedTodos))
+    }
+  }, [])
+
+  // Save todos to localStorage whenever they change
+  useEffect(() => {
+    localStorage.setItem('todos', JSON.stringify(todos))
+  }, [todos])
 
   const addTodo = () => {
     if (inputValue.trim()) {
@@ -22,9 +37,37 @@ function App() {
     setTodos(todos.filter(todo => todo.id !== id))
   }
 
+  const startEdit = (id, text) => {
+    setEditingId(id)
+    setEditingText(text)
+  }
+
+  const saveEdit = () => {
+    if (editingText.trim()) {
+      setTodos(todos.map(todo =>
+        todo.id === editingId ? { ...todo, text: editingText } : todo
+      ))
+    }
+    setEditingId(null)
+    setEditingText('')
+  }
+
+  const cancelEdit = () => {
+    setEditingId(null)
+    setEditingText('')
+  }
+
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') {
       addTodo()
+    }
+  }
+
+  const handleEditKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      saveEdit()
+    } else if (e.key === 'Escape') {
+      cancelEdit()
     }
   }
 
@@ -55,11 +98,40 @@ function App() {
                   onChange={() => toggleTodo(todo.id)}
                   className="todo-checkbox"
                 />
-                <span className="todo-text">{todo.text}</span>
+                {editingId === todo.id ? (
+                  <input
+                    type="text"
+                    value={editingText}
+                    onChange={(e) => setEditingText(e.target.value)}
+                    onKeyDown={handleEditKeyPress}
+                    className="todo-edit-input"
+                    autoFocus
+                  />
+                ) : (
+                  <span className="todo-text">{todo.text}</span>
+                )}
               </div>
-              <button onClick={() => deleteTodo(todo.id)} className="delete-button">
-                Delete
-              </button>
+              <div className="todo-actions">
+                {editingId === todo.id ? (
+                  <>
+                    <button onClick={saveEdit} className="save-button">
+                      Save
+                    </button>
+                    <button onClick={cancelEdit} className="cancel-button">
+                      Cancel
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <button onClick={() => startEdit(todo.id, todo.text)} className="edit-button">
+                      Edit
+                    </button>
+                    <button onClick={() => deleteTodo(todo.id)} className="delete-button">
+                      Delete
+                    </button>
+                  </>
+                )}
+              </div>
             </li>
           ))}
         </ul>
