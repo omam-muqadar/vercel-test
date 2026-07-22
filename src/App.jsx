@@ -1,8 +1,15 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import './App.css'
 import SnakeGame from './SnakeGame'
 
+const TABS = [
+  { id: 'todo', label: '📝 To-Do List' },
+  { id: 'snake', label: '🐍 Snake Game' },
+]
+
 function App() {
+  const [activeTab, setActiveTab] = useState('todo')
+  const tabRefs = useRef([])
   const [todos, setTodos] = useState([])
   const [inputValue, setInputValue] = useState('')
   const [editingId, setEditingId] = useState(null)
@@ -72,9 +79,63 @@ function App() {
     }
   }
 
+  const handleTabKeyDown = (e) => {
+    const currentIndex = TABS.findIndex(tab => tab.id === activeTab)
+    let nextIndex = null
+
+    switch (e.key) {
+      case 'ArrowRight':
+      case 'ArrowDown':
+        nextIndex = (currentIndex + 1) % TABS.length
+        break
+      case 'ArrowLeft':
+      case 'ArrowUp':
+        nextIndex = (currentIndex - 1 + TABS.length) % TABS.length
+        break
+      case 'Home':
+        nextIndex = 0
+        break
+      case 'End':
+        nextIndex = TABS.length - 1
+        break
+      default:
+        return
+    }
+
+    e.preventDefault()
+    e.stopPropagation()
+    setActiveTab(TABS[nextIndex].id)
+    tabRefs.current[nextIndex]?.focus()
+  }
+
   return (
     <main className="app">
-      <div className="app-grid">
+      <nav className="tab-bar" role="tablist" aria-label="App sections">
+        {TABS.map((tab, index) => (
+          <button
+            key={tab.id}
+            ref={(el) => { tabRefs.current[index] = el }}
+            id={`tab-${tab.id}`}
+            role="tab"
+            aria-selected={activeTab === tab.id}
+            aria-controls={`panel-${tab.id}`}
+            tabIndex={activeTab === tab.id ? 0 : -1}
+            className={activeTab === tab.id ? 'tab-button active' : 'tab-button'}
+            onClick={() => setActiveTab(tab.id)}
+            onKeyDown={handleTabKeyDown}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </nav>
+
+      <div
+        className="tab-panel"
+        role="tabpanel"
+        id={`panel-${activeTab}`}
+        aria-labelledby={`tab-${activeTab}`}
+      >
+        {activeTab === 'todo' && (
         <div className="todo-container">
         <h1>To-Do List</h1>
 
@@ -142,8 +203,9 @@ function App() {
           <p className="empty-message">No tasks yet. Add one to get started!</p>
         )}
         </div>
+        )}
 
-        <SnakeGame />
+        {activeTab === 'snake' && <SnakeGame />}
       </div>
     </main>
   )
